@@ -36,6 +36,11 @@ public class ChatSocket extends TextWebSocketHandler /* BinaryWebSocketHandler *
 
         UserModel sender = findUserModel(session);
 
+        if(sender.getNickname() == null){
+            sender.setNickname(message.getPayload());
+            sender.sendMessage("Ustawiono Twój nick na " + message.getPayload());
+        }
+
         sendMessageToAll(message.getPayload() + "\n");
     }
 
@@ -53,7 +58,11 @@ public class ChatSocket extends TextWebSocketHandler /* BinaryWebSocketHandler *
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        userList.add(new UserModel(session));
+        UserModel sender = new UserModel(session);
+        userList.add(sender);
+
+        sender.sendMessage("Witaj w komunikatorze AkademiiKodu!");
+        sender.sendMessage("Twoja pierwsza wiadomość, będzie Twoim nickiem");
     }
 
     @Override
