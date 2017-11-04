@@ -9,11 +9,20 @@ import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 @Configuration
 @EnableWebSocket
 public class ChatSocket extends TextWebSocketHandler /* BinaryWebSocketHandler */ implements WebSocketConfigurer{
+
+    List<WebSocketSession> userList;
+
+    public ChatSocket() {
+        userList = new ArrayList<>();
+    }
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry webSocketHandlerRegistry) {
@@ -22,16 +31,22 @@ public class ChatSocket extends TextWebSocketHandler /* BinaryWebSocketHandler *
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        System.out.println("Przyszla wiadomosc");
+        userList.forEach(s -> {
+            try {
+                s.sendMessage(new TextMessage(message.getPayload() + "\n"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        System.out.println("Ktoś podłączył się pod socket");
+        userList.add(session);
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-        System.out.println("Ktos odszedl");
+        userList.remove(session);
     }
 }
