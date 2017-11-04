@@ -18,7 +18,7 @@ import java.util.logging.Logger;
 @EnableWebSocket
 public class ChatSocket extends TextWebSocketHandler /* BinaryWebSocketHandler */ implements WebSocketConfigurer{
 
-    List<WebSocketSession> userList;
+    List<UserModel> userList;
 
     public ChatSocket() {
         userList = new ArrayList<>();
@@ -31,22 +31,42 @@ public class ChatSocket extends TextWebSocketHandler /* BinaryWebSocketHandler *
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        userList.forEach(s -> {
-            try {
-                s.sendMessage(new TextMessage(message.getPayload() + "\n"));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
+        // HandleTextMessage to metoda, do ktorej trafiaja wszystkie wiadomosci od
+        // podlaczonych clientow
+
+        
+        sendMessageToAll(message.getPayload() + "\n");
+    }
+
+
+
+    private void sendMessageToAll(String message) {
+        userList.forEach(s -> s.sendMessage(message));
     }
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        userList.add(session);
+        userList.add(new UserModel(session));
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-        userList.remove(session);
+        userList.remove(userList.stream()
+                .filter(s -> s.getSession().equals(session))
+                .findAny()
+                .get());
+        // UserModel == WebSocketSession? NIE
+        // UserModel == UserModel? tak
+        // Przeszukuje liste od UserModel, która zawiera WebSocketSession
+        // i szukam usera o takiej samej sesji
+        // jesli znajde, zwracam go, a nastepnie usuwam.
+
+        // REMOVE: -> UserModel3 (model przyblizony)
+        //UserModel1 == UserModel3? NIE
+        //UserModel2 == UserModel3? NIE
+        //UserModel3 == UserModel3? TAK -> USUN
+        //UserModel4
+
+
     }
 }
