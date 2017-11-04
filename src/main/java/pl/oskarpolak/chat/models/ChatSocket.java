@@ -18,7 +18,7 @@ import java.util.logging.Logger;
 @EnableWebSocket
 public class ChatSocket extends TextWebSocketHandler /* BinaryWebSocketHandler */ implements WebSocketConfigurer{
 
-    List<UserModel> userList;
+    private List<UserModel> userList;
 
     public ChatSocket() {
         userList = new ArrayList<>();
@@ -34,10 +34,17 @@ public class ChatSocket extends TextWebSocketHandler /* BinaryWebSocketHandler *
         // HandleTextMessage to metoda, do ktorej trafiaja wszystkie wiadomosci od
         // podlaczonych clientow
 
-        
+        UserModel sender = findUserModel(session);
+
         sendMessageToAll(message.getPayload() + "\n");
     }
 
+    private UserModel findUserModel(WebSocketSession session) {
+        return userList.stream()
+                                        .filter(s -> s.getSession().equals(session))
+                                        .findAny()
+                                        .get();
+    }
 
 
     private void sendMessageToAll(String message) {
@@ -51,10 +58,7 @@ public class ChatSocket extends TextWebSocketHandler /* BinaryWebSocketHandler *
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-        userList.remove(userList.stream()
-                .filter(s -> s.getSession().equals(session))
-                .findAny()
-                .get());
+        userList.remove(findUserModel(session));
         // UserModel == WebSocketSession? NIE
         // UserModel == UserModel? tak
         // Przeszukuje liste od UserModel, która zawiera WebSocketSession
