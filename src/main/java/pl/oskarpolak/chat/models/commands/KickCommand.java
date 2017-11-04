@@ -7,4 +7,14 @@ public class KickCommand implements Command {
     public void parseCommand(UserModel model, String... args) {
 
     }
+
+    @Override
+    public int argsCount() {
+        return 0;
+    }
+
+    @Override
+    public String error() {
+        return null;
+    }
 }
