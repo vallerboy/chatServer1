@@ -8,22 +8,23 @@ import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
+import pl.oskarpolak.chat.models.commands.CommandFactory;
 
-import java.io.IOException;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 @Configuration
 @EnableWebSocket
 public class ChatSocket extends TextWebSocketHandler /* BinaryWebSocketHandler */ implements WebSocketConfigurer{
 
     private List<UserModel> userList;
+    private CommandFactory commandFactory;
 
     public ChatSocket() {
         userList = new ArrayList<>();
+        commandFactory = new CommandFactory(userList);
     }
 
     @Override
@@ -42,6 +43,10 @@ public class ChatSocket extends TextWebSocketHandler /* BinaryWebSocketHandler *
             sender.setNickname(message.getPayload());
             sender.sendMessage("Ustawiono Twój nick na " + message.getPayload());
             sendMessageToAllWithoutMe(sender, "Użytkownik " + message.getPayload() + " dołączył");
+            return;
+        }
+
+        if(commandFactory.parseCommand(sender, message.getPayload())){
             return;
         }
 

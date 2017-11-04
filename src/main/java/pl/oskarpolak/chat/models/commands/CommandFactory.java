@@ -4,6 +4,7 @@ import org.apache.catalina.User;
 import pl.oskarpolak.chat.models.UserModel;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -12,6 +13,7 @@ public class CommandFactory {
     private static Map<String, Command> stringCommandMap;
 
     static  {
+        stringCommandMap = new HashMap<>();
         stringCommandMap.put("command", new KickCommand());
     }
 
