@@ -10,6 +10,8 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -41,7 +43,16 @@ public class ChatSocket extends TextWebSocketHandler /* BinaryWebSocketHandler *
             sender.sendMessage("Ustawiono Twój nick na " + message.getPayload());
         }
 
-        sendMessageToAll(message.getPayload() + "\n");
+        sendMessageToAll(generatePrefix(sender) + message.getPayload() + "\n");
+    }
+
+
+    private String generatePrefix(UserModel userModel) {
+        return "<" + getTime() + ">" +  " " + userModel.getNickname();
+    }
+
+    private String getTime() {
+        return LocalTime.now().format(DateTimeFormatter.ofPattern("mm:ss"));
     }
 
     private UserModel findUserModel(WebSocketSession session) {
