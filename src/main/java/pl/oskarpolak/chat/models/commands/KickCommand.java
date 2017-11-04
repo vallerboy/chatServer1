@@ -1,12 +1,29 @@
 package pl.oskarpolak.chat.models.commands;
 
+import org.apache.catalina.User;
 import pl.oskarpolak.chat.models.UserModel;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
 
 public class KickCommand implements Command {
     @Override
-    public void parseCommand(UserModel model, String... args) {
+    public void parseCommand(UserModel sender, List<UserModel> userModelList, String... args) {
         String nickToKick = args[0];
+        Optional<UserModel> userModel = userModelList.stream()
+                .filter(s -> s.getNickname().equals(nickToKick))
+                .findAny();
 
+        if(userModel.isPresent()){
+            try {
+                userModel.get().getSession().close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }else{
+            sender.sendMessage("Taki user nie istnieje");
+        }
     }
 
     @Override

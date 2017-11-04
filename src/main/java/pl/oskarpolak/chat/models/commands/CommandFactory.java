@@ -40,7 +40,7 @@ public class CommandFactory {
             return true;
         }
 
-        command.parseCommand(userModel, args);
+        command.parseCommand(userModel, userList, args);
         return true;
     }
 }
