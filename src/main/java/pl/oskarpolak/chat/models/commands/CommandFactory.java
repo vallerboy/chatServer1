@@ -14,7 +14,7 @@ public class CommandFactory {
 
     static  {
         stringCommandMap = new HashMap<>();
-        stringCommandMap.put("command", new KickCommand());
+        stringCommandMap.put("kick", new KickCommand());
     }
 
     private List<UserModel> userList;
@@ -29,7 +29,7 @@ public class CommandFactory {
         }
         // /kick Oskar
         String[] parts = s.split(" ");
-        String[] args = Arrays.copyOfRange(parts, 1, parts.length+1);
+        String[] args = Arrays.copyOfRange(parts, 1, parts.length);
         String commandAlone = parts[0].substring(1, parts[0].length());
         if(!stringCommandMap.containsKey(commandAlone)){
             userModel.sendMessage("Taka komenda nie istnieje!");
@@ -37,7 +37,7 @@ public class CommandFactory {
         }
 
         Command command = stringCommandMap.get(commandAlone);
-        if(command.argsCount() != parts.length /* ilosc indexow jest od zera */){
+        if(command.argsCount() != args.length){
             userModel.sendMessage(command.error());
             return true;
         }
