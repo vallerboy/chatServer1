@@ -41,18 +41,26 @@ public class ChatSocket extends TextWebSocketHandler /* BinaryWebSocketHandler *
         if(sender.getNickname() == null){
             sender.setNickname(message.getPayload());
             sender.sendMessage("Ustawiono Twój nick na " + message.getPayload());
+            sendMessageToAllWithoutMe(sender, "Użytkownik " + message.getPayload() + " dołączył");
+            return;
         }
 
-        sendMessageToAll(generatePrefix(sender) + message.getPayload() + "\n");
+        sendMessageToAll(generatePrefix(sender) + message.getPayload());
+    }
+
+    private void sendMessageToAllWithoutMe(UserModel sender, String s) {
+        userList.stream()
+                .filter(user -> !user.equals(sender))
+                .forEach(user -> user.sendMessage(s));
     }
 
 
     private String generatePrefix(UserModel userModel) {
-        return "<" + getTime() + ">" +  " " + userModel.getNickname();
+        return "<" + getTime() + ">" +  " " + userModel.getNickname() + ": ";
     }
 
     private String getTime() {
-        return LocalTime.now().format(DateTimeFormatter.ofPattern("mm:ss"));
+        return LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
     }
 
     private UserModel findUserModel(WebSocketSession session) {
@@ -78,7 +86,11 @@ public class ChatSocket extends TextWebSocketHandler /* BinaryWebSocketHandler *
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-        userList.remove(findUserModel(session));
+        UserModel userModel = findUserModel(session);
+        if(userModel.getNickname() != null) {
+            sendMessageToAllWithoutMe(userModel, "Użytkownik " + userModel.getNickname() + " opuścił chat");
+        }
+        userList.remove(userModel);
         // UserModel == WebSocketSession? NIE
         // UserModel == UserModel? tak
         // Przeszukuje liste od UserModel, która zawiera WebSocketSession

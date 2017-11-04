@@ -53,7 +53,7 @@ public class UserModel {
 
     public void sendMessage(String message) {
         try {
-            session.sendMessage(new TextMessage(message));
+            session.sendMessage(new TextMessage(message + "\n"));
         } catch (IOException e) {
             e.printStackTrace();
         }
