@@ -7,8 +7,8 @@ import java.util.List;
 public class MeCommand implements Command {
     @Override
     public void parseCommand(UserModel model, List<UserModel> userList, String... args) {
-        model.sendMessagePacket("~ Liczba prywatnych wiadomości: " + model.getSentPrivate());
-        model.sendMessagePacket("~ Liczba globalnych wiadomości: " + model.getSentGlobal());
+        model.sendDialogPacket("~ Liczba prywatnych wiadomości: " + model.getSentPrivate());
+        model.sendDialogPacket("~ Liczba globalnych wiadomości: " + model.getSentGlobal());
     }
 
     @Override

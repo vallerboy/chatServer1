@@ -73,7 +73,7 @@ public class UserModel {
     public void sendMessagePacket(String message) {
         MessageModel messageModel = new MessageModel();
         messageModel.setMessageType(MessageModel.MessageType.MESSAGE);
-        messageModel.setContext(message);
+        messageModel.setContext(message + "\n");
         try {
             session.sendMessage(new TextMessage(ChatSocket.GSON.toJson(messageModel)));
         } catch (IOException e) {
