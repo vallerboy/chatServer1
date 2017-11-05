@@ -61,7 +61,7 @@ public class ChatSocket extends TextWebSocketHandler /* BinaryWebSocketHandler *
     private void parseMessagePacket(UserModel sender, MessageModel messageModel) {
         if(sender.getNickname() == null){
             sender.setNickname(messageModel.getContext());
-            sender.sendMessage("Ustawiono Twój nick na " + messageModel.getContext());
+            sender.sendMessagePacket("Ustawiono Twój nick na " + messageModel.getContext());
             sendMessageToAllWithoutMe(sender, "Użytkownik " + messageModel.getContext() + " dołączył");
             return;
         }
@@ -77,7 +77,7 @@ public class ChatSocket extends TextWebSocketHandler /* BinaryWebSocketHandler *
     private void sendMessageToAllWithoutMe(UserModel sender, String s) {
         userList.stream()
                 .filter(user -> !user.equals(sender))
-                .forEach(user -> user.sendMessage(s));
+                .forEach(user -> user.sendMessagePacket(s));
     }
 
 
@@ -98,7 +98,7 @@ public class ChatSocket extends TextWebSocketHandler /* BinaryWebSocketHandler *
 
 
     private void sendMessageToAll(String message) {
-        userList.forEach(s -> s.sendMessage(message));
+        userList.forEach(s -> s.sendMessagePacket(message));
     }
 
     @Override
@@ -106,8 +106,8 @@ public class ChatSocket extends TextWebSocketHandler /* BinaryWebSocketHandler *
         UserModel sender = new UserModel(session);
         userList.add(sender);
 
-        sender.sendMessage("Witaj w komunikatorze AkademiiKodu!");
-        sender.sendMessage("Twoja pierwsza wiadomość, będzie Twoim nickiem");
+        sender.sendMessagePacket("Witaj w komunikatorze AkademiiKodu!");
+        sender.sendMessagePacket("Twoja pierwsza wiadomość, będzie Twoim nickiem");
     }
 
     @Override
