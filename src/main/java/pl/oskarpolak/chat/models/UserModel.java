@@ -69,7 +69,10 @@ public class UserModel {
         return result;
     }
 
-    public void sendMessage(String message) {
+    public void sendMessagePacket(String message) {
+        MessageModel messageModel = new MessageModel();
+        messageModel.setMessageType(MessageModel.MessageType.MESSAGE);
+        messageModel.setContext(message);
         try {
             session.sendMessage(new TextMessage(message + "\n"));
         } catch (IOException e) {

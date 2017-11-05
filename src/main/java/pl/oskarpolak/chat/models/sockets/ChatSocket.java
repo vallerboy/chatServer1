@@ -48,19 +48,7 @@ public class ChatSocket extends TextWebSocketHandler /* BinaryWebSocketHandler *
 
         switch (messageModel.getMessageType()) {
             case MESSAGE: {
-                if(sender.getNickname() == null){
-                    sender.setNickname(message.getPayload());
-                    sender.sendMessage("Ustawiono Twój nick na " + message.getPayload());
-                    sendMessageToAllWithoutMe(sender, "Użytkownik " + message.getPayload() + " dołączył");
-                    return;
-                }
-
-                if(commandFactory.parseCommand(sender, message.getPayload())){
-                    return;
-                }
-
-                sendMessageToAll(generatePrefix(sender) + message.getPayload());
-                sender.addGlobalMessage();
+                parseMessagePacket(sender, messageModel);
                 break;
             }
         }
@@ -68,6 +56,22 @@ public class ChatSocket extends TextWebSocketHandler /* BinaryWebSocketHandler *
 
 
 
+    }
+
+    private void parseMessagePacket(UserModel sender, MessageModel messageModel) {
+        if(sender.getNickname() == null){
+            sender.setNickname(messageModel.getContext());
+            sender.sendMessage("Ustawiono Twój nick na " + messageModel.getContext());
+            sendMessageToAllWithoutMe(sender, "Użytkownik " + messageModel.getContext() + " dołączył");
+            return;
+        }
+
+        if(commandFactory.parseCommand(sender, messageModel.getContext())){
+            return;
+        }
+
+        sendMessageToAll(generatePrefix(sender) + messageModel.getContext());
+        sender.addGlobalMessage();
     }
 
     private void sendMessageToAllWithoutMe(UserModel sender, String s) {

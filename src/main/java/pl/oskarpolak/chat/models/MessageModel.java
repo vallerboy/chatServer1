@@ -4,6 +4,10 @@ import javax.xml.soap.SAAJResult;
 import java.io.Serializable;
 
 public class MessageModel implements Serializable {
+    public MessageModel() {
+
+    }
+
     public enum MessageType {
         MESSAGE(), OPEN_DIALOG();
     }
