@@ -18,6 +18,8 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.regex.Pattern;
 
 @Configuration
 @EnableWebSocket
@@ -60,6 +62,9 @@ public class ChatSocket extends TextWebSocketHandler /* BinaryWebSocketHandler *
 
     private void parseMessagePacket(UserModel sender, MessageModel messageModel) {
         if(sender.getNickname() == null){
+            if (checkBusyNick(sender, messageModel)) return;
+            if (checkNickByRegex(sender, messageModel)) return;
+
             sender.setNickname(messageModel.getContext());
             sender.sendMessagePacket("Ustawiono Twój nick na " + messageModel.getContext());
             sendMessageToAllWithoutMe(sender, "Użytkownik " + messageModel.getContext() + " dołączył");
@@ -72,6 +77,24 @@ public class ChatSocket extends TextWebSocketHandler /* BinaryWebSocketHandler *
 
         sendMessageToAll(generatePrefix(sender) + messageModel.getContext());
         sender.addGlobalMessage();
+    }
+
+    private boolean checkBusyNick(UserModel sender, MessageModel messageModel) {
+        for (UserModel userModel : userList) {
+            if(userModel.getNickname() != null && userModel.getNickname().equals(messageModel.getContext())){
+                sender.sendMessagePacket("~ Nick jest zajety, spróbuj innego");
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean checkNickByRegex(UserModel sender, MessageModel messageModel) {
+        if(!Pattern.matches("\\w{3,}", messageModel.getContext())){
+            sender.sendMessagePacket("Nick nie spełnia wymogów, same cyfry i litery i min 3!");
+            return true;
+        }
+        return false;
     }
 
     private void sendMessageToAllWithoutMe(UserModel sender, String s) {
