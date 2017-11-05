@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -90,12 +91,13 @@ public class ChatSocket extends TextWebSocketHandler /* BinaryWebSocketHandler *
         sender.addGlobalMessage();
     }
 
-    private void saveLogToDatabase(UserModel sender, String context) {
+    @Async
+    void saveLogToDatabase(UserModel sender, String context) {
         LogModel logModel = new LogModel();
         logModel.setMessage(context);
         logModel.setSender(sender.getNickname());
         logModel.setDate(LocalDateTime.now());
-
+        ;
         logRepository.save(logModel);
     }
 
