@@ -16,6 +16,7 @@ public class CommandFactory {
         stringCommandMap = new HashMap<>();
         stringCommandMap.put("kick", new KickCommand());
         stringCommandMap.put("pm", new PmCommand());
+        stringCommandMap.put("help", new HelpCommand());
     }
 
 
@@ -39,12 +40,19 @@ public class CommandFactory {
         }
 
         Command command = stringCommandMap.get(commandAlone);
-        if(command.argsCount() != args.length || command.argsCount() == -1){
-            userModel.sendMessage(command.error());
-            return true;
+        if(command.argsCount() != -1){
+            if(command.argsCount() != args.length){
+                userModel.sendMessage(command.error());
+                return true;
+            }
+
         }
 
         command.parseCommand(userModel, userList, args);
         return true;
+    }
+
+    public static Map<String, Command> getCommandMap() {
+        return stringCommandMap;
     }
 }

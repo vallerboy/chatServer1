@@ -12,7 +12,7 @@ public class PmCommand implements Command {
     @Override
     public void parseCommand(UserModel sender, List<UserModel> userList, String... args) {
         Optional<UserModel> toWho = userList.stream()
-                                        .filter(s -> s.equals(args[0]))
+                                        .filter(s -> s.getNickname().equals(args[0]))
                                         .findAny();
         args[0]  = "";
 
