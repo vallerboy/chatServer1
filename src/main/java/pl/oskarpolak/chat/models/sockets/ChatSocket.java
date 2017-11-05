@@ -25,7 +25,7 @@ public class ChatSocket extends TextWebSocketHandler /* BinaryWebSocketHandler *
 
     private List<UserModel> userList;
     private CommandFactory commandFactory;
-    private static final Gson gson = new GsonBuilder().create();
+    public static final Gson GSON = new GsonBuilder().create();
 
     public ChatSocket() {
         userList = new ArrayList<>();
@@ -44,7 +44,7 @@ public class ChatSocket extends TextWebSocketHandler /* BinaryWebSocketHandler *
 
         UserModel sender = findUserModel(session);
 
-        MessageModel messageModel = gson.fromJson(message.getPayload(), MessageModel.class);
+        MessageModel messageModel = GSON.fromJson(message.getPayload(), MessageModel.class);
 
         switch (messageModel.getMessageType()) {
             case MESSAGE: {

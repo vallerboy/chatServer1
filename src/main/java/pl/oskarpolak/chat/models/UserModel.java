@@ -2,6 +2,7 @@ package pl.oskarpolak.chat.models;
 
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
+import pl.oskarpolak.chat.models.sockets.ChatSocket;
 
 import java.io.IOException;
 
@@ -74,7 +75,18 @@ public class UserModel {
         messageModel.setMessageType(MessageModel.MessageType.MESSAGE);
         messageModel.setContext(message);
         try {
-            session.sendMessage(new TextMessage(message + "\n"));
+            session.sendMessage(new TextMessage(ChatSocket.GSON.toJson(messageModel)));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendDialogPacket(String message) {
+        MessageModel messageModel = new MessageModel();
+        messageModel.setMessageType(MessageModel.MessageType.OPEN_DIALOG);
+        messageModel.setContext(message);
+        try {
+            session.sendMessage(new TextMessage(ChatSocket.GSON.toJson(messageModel)));
         } catch (IOException e) {
             e.printStackTrace();
         }
