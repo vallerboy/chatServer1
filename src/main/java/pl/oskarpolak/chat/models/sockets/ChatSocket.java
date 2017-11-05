@@ -2,6 +2,7 @@ package pl.oskarpolak.chat.models.sockets;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -10,10 +11,13 @@ import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
+import pl.oskarpolak.chat.models.LogModel;
 import pl.oskarpolak.chat.models.MessageModel;
 import pl.oskarpolak.chat.models.UserModel;
 import pl.oskarpolak.chat.models.commands.CommandFactory;
+import pl.oskarpolak.chat.models.respositories.LogRepository;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -29,9 +33,13 @@ public class ChatSocket extends TextWebSocketHandler /* BinaryWebSocketHandler *
     private CommandFactory commandFactory;
     public static final Gson GSON = new GsonBuilder().create();
 
-    public ChatSocket() {
+    LogRepository logRepository;
+
+    @Autowired
+    public ChatSocket(LogRepository logRepository) {
         userList = new ArrayList<>();
         commandFactory = new CommandFactory(userList);
+        this.logRepository = logRepository;
     }
 
     @Override
@@ -76,7 +84,19 @@ public class ChatSocket extends TextWebSocketHandler /* BinaryWebSocketHandler *
         }
 
         sendMessageToAll(generatePrefix(sender) + messageModel.getContext());
+
+        saveLogToDatabase(sender, messageModel.getContext());
+
         sender.addGlobalMessage();
+    }
+
+    private void saveLogToDatabase(UserModel sender, String context) {
+        LogModel logModel = new LogModel();
+        logModel.setMessage(context);
+        logModel.setSender(sender.getNickname());
+        logModel.setDate(LocalDateTime.now());
+
+        logRepository.save(logModel);
     }
 
     private boolean checkBusyNick(UserModel sender, MessageModel messageModel) {
