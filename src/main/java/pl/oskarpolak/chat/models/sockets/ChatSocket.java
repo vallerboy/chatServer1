@@ -1,5 +1,7 @@
-package pl.oskarpolak.chat.models;
+package pl.oskarpolak.chat.models.sockets;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -8,6 +10,8 @@ import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
+import pl.oskarpolak.chat.models.MessageModel;
+import pl.oskarpolak.chat.models.UserModel;
 import pl.oskarpolak.chat.models.commands.CommandFactory;
 
 import java.time.LocalTime;
@@ -21,6 +25,7 @@ public class ChatSocket extends TextWebSocketHandler /* BinaryWebSocketHandler *
 
     private List<UserModel> userList;
     private CommandFactory commandFactory;
+    private static final Gson gson = new GsonBuilder().create();
 
     public ChatSocket() {
         userList = new ArrayList<>();
@@ -39,19 +44,30 @@ public class ChatSocket extends TextWebSocketHandler /* BinaryWebSocketHandler *
 
         UserModel sender = findUserModel(session);
 
-        if(sender.getNickname() == null){
-            sender.setNickname(message.getPayload());
-            sender.sendMessage("Ustawiono Twój nick na " + message.getPayload());
-            sendMessageToAllWithoutMe(sender, "Użytkownik " + message.getPayload() + " dołączył");
-            return;
+        MessageModel messageModel = gson.fromJson(message.getPayload(), MessageModel.class);
+
+        switch (messageModel.getMessageType()) {
+            case MESSAGE: {
+                if(sender.getNickname() == null){
+                    sender.setNickname(message.getPayload());
+                    sender.sendMessage("Ustawiono Twój nick na " + message.getPayload());
+                    sendMessageToAllWithoutMe(sender, "Użytkownik " + message.getPayload() + " dołączył");
+                    return;
+                }
+
+                if(commandFactory.parseCommand(sender, message.getPayload())){
+                    return;
+                }
+
+                sendMessageToAll(generatePrefix(sender) + message.getPayload());
+                sender.addGlobalMessage();
+                break;
+            }
         }
 
-        if(commandFactory.parseCommand(sender, message.getPayload())){
-            return;
-        }
 
-        sendMessageToAll(generatePrefix(sender) + message.getPayload());
-        sender.addGlobalMessage();
+
+
     }
 
     private void sendMessageToAllWithoutMe(UserModel sender, String s) {
