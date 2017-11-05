@@ -15,7 +15,9 @@ public class CommandFactory {
     static  {
         stringCommandMap = new HashMap<>();
         stringCommandMap.put("kick", new KickCommand());
+        stringCommandMap.put("pm", new PmCommand());
     }
+
 
     private List<UserModel> userList;
 
@@ -27,7 +29,7 @@ public class CommandFactory {
         if(!s.startsWith("/")){
             return false;
         }
-        // /kick Oskar
+        // /kick Oskar Cos Cos Cos Cos Cos
         String[] parts = s.split(" ");
         String[] args = Arrays.copyOfRange(parts, 1, parts.length);
         String commandAlone = parts[0].substring(1, parts[0].length());
@@ -37,7 +39,7 @@ public class CommandFactory {
         }
 
         Command command = stringCommandMap.get(commandAlone);
-        if(command.argsCount() != args.length){
+        if(command.argsCount() != args.length || command.argsCount() == -1){
             userModel.sendMessage(command.error());
             return true;
         }
