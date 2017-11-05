@@ -12,6 +12,10 @@ public class HelpCommand implements Command{
         for (Map.Entry<String, Command> stringCommandEntry : CommandFactory.getCommandMap().entrySet()) {
             model.sendMessage("~ " + stringCommandEntry.getKey() + " - " + stringCommandEntry.getValue().error());
         }
+
+//        for (String key : CommandFactory.getCommandMap().keySet()) {
+//            model.sendMessage("~ " + key + " - " + CommandFactory.getCommandMap().get(key));
+//        }
     }
 
     @Override

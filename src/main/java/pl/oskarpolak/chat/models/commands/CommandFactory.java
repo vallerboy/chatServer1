@@ -17,6 +17,7 @@ public class CommandFactory {
         stringCommandMap.put("kick", new KickCommand());
         stringCommandMap.put("pm", new PmCommand());
         stringCommandMap.put("help", new HelpCommand());
+        stringCommandMap.put("user", new UserCommand());
     }
 
 
