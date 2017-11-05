@@ -51,6 +51,7 @@ public class ChatSocket extends TextWebSocketHandler /* BinaryWebSocketHandler *
         }
 
         sendMessageToAll(generatePrefix(sender) + message.getPayload());
+        sender.addGlobalMessage();
     }
 
     private void sendMessageToAllWithoutMe(UserModel sender, String s) {

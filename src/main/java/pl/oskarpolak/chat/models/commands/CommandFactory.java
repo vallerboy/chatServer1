@@ -18,6 +18,7 @@ public class CommandFactory {
         stringCommandMap.put("pm", new PmCommand());
         stringCommandMap.put("help", new HelpCommand());
         stringCommandMap.put("user", new UserCommand());
+        stringCommandMap.put("me", new MeCommand());
     }
 
 
